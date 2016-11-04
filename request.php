@@ -31,14 +31,8 @@ class Request extends \ArrayObject implements API\Interfaces\toString, Interface
 	 * @see https://secure.php.net/manual/en/function.curl-setopt.php
 	 */
 	const DEFAULT_OPTS = array(
-		\CURLOPT_POST           => true,
-		\CURLOPT_HEADER         => true,
-		\CURLOPT_FAILONERROR    => true,
-		\CURLOPT_RETURNTRANSFER => true,
-		\CURLOPT_SSL_VERIFYHOST => true,
-		\CURLOPT_CONNECTTIMEOUT => 5,
-		\CURLOPT_TIMEOUT        => 5,
-		\CURLOPT_FRESH_CONNECT  => true,
+		CURLOPT_POST           => true,
+		CURLOPT_RETURNTRANSFER => true,
 	);
 
 	const DEFAULT_HEADERS = array();
@@ -64,10 +58,12 @@ class Request extends \ArrayObject implements API\Interfaces\toString, Interface
 		parent::__construct($data, self::ARRAY_AS_PROPS);
 		$headers = array_merge($headers, self::DEFAULT_HEADERS);
 		$opts = array_merge($opts, self::DEFAULT_OPTS);
-		$opts[\CURLOPT_URL] = $this->_url;
-		$opts[\CURLOPT_HTTPHEADER] = $this->_getHeaders($headers);
-		$this->init($this->_url);
-		$this->setOptArray($opts);
+		$this->init();
+		// $this->setOptArray($opts);
+		$this->setOpt(CURLOPT_POST, true);
+		$this->setOpt(CURLOPT_RETURNTRANSFER, true);
+		$this->setOpt(CURLOPT_URL, $this->_url);
+		$this->setOpt(CURLOPT_HTTPHEADER, $this->_getHeaders($headers));
 	}
 
 	public function __destruct()
@@ -83,10 +79,15 @@ class Request extends \ArrayObject implements API\Interfaces\toString, Interface
 	public function __invoke(Array $data = array())
 	{
 		//return array_merge($this->getArrayCopy(), $data);
-		$this->setOpt(\CURLOPT_POSTFIELDS, http_build_query(array_merge($this, $data)));
+		$this->setOpt(
+			\CURLOPT_POSTFIELDS,
+			http_build_query(array_merge($this->getArrayCopy(), $data))
+		);
 		$resp = $this->exec();
 		if ($this->errno() !== 0) {
 			trigger_error($this->error());
+		} elseif ($resp === false) {
+			throw new \Exception('curl_exec returned boolean false.');
 		}
 		return $resp;
 	}
