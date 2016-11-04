@@ -83,7 +83,7 @@ class Request extends \ArrayObject implements API\Interfaces\toString, Interface
 	public function __invoke(Array $data = array())
 	{
 		//return array_merge($this->getArrayCopy(), $data);
-		$this->setOpt(\CURLOPT_POSTFIELDS, array_merge($this, $data));
+		$this->setOpt(\CURLOPT_POSTFIELDS, http_build_query(array_merge($this, $data)));
 		$resp = $this->exec();
 		if ($this->errno() !== 0) {
 			trigger_error($this->error());
