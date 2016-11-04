@@ -60,6 +60,7 @@ class Request extends \ArrayObject implements API\Interfaces\toString, Interface
 		$opts = array_merge($opts, self::DEFAULT_OPTS);
 		$this->init();
 		// $this->setOptArray($opts);
+		$this->setOpt(CURLOPT_HEADER, true);
 		$this->setOpt(CURLOPT_POST, true);
 		$this->setOpt(CURLOPT_RETURNTRANSFER, true);
 		$this->setOpt(CURLOPT_URL, $this->_url);
@@ -83,7 +84,7 @@ class Request extends \ArrayObject implements API\Interfaces\toString, Interface
 			\CURLOPT_POSTFIELDS,
 			http_build_query(array_merge($this->getArrayCopy(), $data))
 		);
-		$resp = $this->exec();
+		$resp = new Response($this->_ch);
 		if ($this->errno() !== 0) {
 			trigger_error($this->error());
 		} elseif ($resp === false) {
