@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace shgysk8zer0\cURL\Interafeces;
+namespace shgysk8zer0\cURL\Interfaces;
 
 /**
  * curl_* functions as class methods
